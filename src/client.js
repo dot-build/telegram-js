@@ -1,3 +1,6 @@
+/**
+ * Telegram Client class
+ */
 class Client {
     constructor(schema) {
         this.schema = schema;

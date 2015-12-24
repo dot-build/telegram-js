@@ -3,6 +3,7 @@ describe('Client', function() {
         it('should keep a reference to API schema', function () {
             let schema = {};
             let client = new Client(schema);
+
             expect(client.schema).toBe(schema);
         });
     });
