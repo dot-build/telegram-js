@@ -19,4 +19,8 @@ class Telegram {
 
         Telegram.schema = { type, service };
     }
+
+    static createClient() {
+        return new Client(Telegram.schema);
+    }
 }

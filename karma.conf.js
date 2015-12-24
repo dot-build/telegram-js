@@ -7,6 +7,7 @@ module.exports = function(config) {
         browsers: ['PhantomJS'],
         frameworks: ['jasmine'],
         files: [
+            require.resolve('babel-polyfill/browser'),
             'src/**/*.js',
             'test/**/*.spec.js'
         ],

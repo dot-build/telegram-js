@@ -79,4 +79,15 @@ describe('Telegram', function() {
             expect(test).toThrow(new Error('You must use Telegram.configure() first'));
         });
     });
+
+    describe('::createClient()', function() {
+        it('should create and return a client using the configured schema', function () {
+            let schema = {};
+            Telegram.schema = schema;
+
+            let client = Telegram.createClient();
+            expect(client instanceof Client).toBe(true);
+            expect(client.schema).toBe(schema);
+        });
+    });
 });
