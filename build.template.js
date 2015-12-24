@@ -2,6 +2,8 @@
 
     /* content goes here */
 
+    Telegram.Client = Client;
+
     if (typeof define === 'function' && define.amd) {
         define(function() {
             return Telegram;
