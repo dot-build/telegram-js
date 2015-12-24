@@ -1,0 +1,6 @@
+{
+	"globals": {},
+	"strict": false,
+	"node": true,
+	"jasmine": true
+}

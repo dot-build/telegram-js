@@ -1,0 +1,7 @@
+{
+	"js": {
+		"indent_with_tabs": false,
+		"indent_size": 4,
+		"indent_char": " "
+	}
+}
