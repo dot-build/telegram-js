@@ -1,11 +1,15 @@
 class Telegram {
     /**
-     * @param {MTProto} MTProto An object with the MtProto implementation
+     * @param {MTProto} MTProto An object with the MTProto implementation
      * @param {TL} TL An object with the Telegram's TypeLanguage implementation
      */
-    static configure(MTProto, TL) {
-        Telegram.MTProto = MTProto;
-        Telegram.TL = TL;
+    constructor(MTProto, TL) {
+        if (!MTProto || !TL) {
+            throw new Error('You must invoke new Telegram(MtProto, TypeLanguage)');
+        }
+
+        this.MTProto = MTProto;
+        this.TL = TL;
     }
 
     /**
@@ -13,12 +17,8 @@ class Telegram {
      *                        The Telegram API schema can be downloaded
      *                        here: https://core.telegram.org/schema
      */
-    static useSchema(schema) {
-        if (!Telegram.TL) {
-            throw new Error('You must use Telegram.configure() first');
-        }
-
-        let buildTypes = Telegram.TL.TypeBuilder.buildTypes;
+    useSchema(schema) {
+        let buildTypes = this.TL.TypeBuilder.buildTypes;
 
         var type = {_id: 'api.type'};
         buildTypes(schema.constructors, null, type, false);
@@ -26,7 +26,7 @@ class Telegram {
         var service = { _id: 'api.service'};
         buildTypes(schema.methods, null, service, true);
 
-        Telegram.schema = { type, service };
+        this.schema = { type, service };
     }
 
     /**
@@ -34,6 +34,6 @@ class Telegram {
      * @return {Client} An instance of Telegram.Client
      */
     static createClient() {
-        return new Client(Telegram.schema);
+        return new Client(this.schema);
     }
 }

@@ -1,22 +1,26 @@
 /* global Telegram */
 describe('Telegram', function() {
-    describe('::createClient(config)', function() {
-        // xit('should create and return a client instance', function() {});
-    });
-
-    describe('::configure(MtProto mtProto, TypeLanguage tl)', function() {
+    describe('#constructor(MtProto mtProto, TypeLanguage tl)', function() {
         it('should allow to inject references to MtProto and TypeLanguage', function() {
             let mtProto = {};
             let TL = {};
 
-            Telegram.configure(mtProto, TL);
+            let instance = new Telegram(mtProto, TL);
 
-            expect(Telegram.MTProto).toBe(mtProto);
-            expect(Telegram.TL).toBe(TL);
+            expect(instance.MTProto).toBe(mtProto);
+            expect(instance.TL).toBe(TL);
+        });
+
+        it('should throw an error if the dependencies are not injected', function () {
+            function test () {
+                let client = new Telegram();
+            }
+
+            expect(test).toThrow(new Error('You must invoke new Telegram(MtProto, TypeLanguage)'));
         });
     });
 
-    describe('::useSchema(schema)', function() {
+    describe('#useSchema(schema)', function() {
         it('should build the types and methods used on clients from schema', function() {
             // From Telegram API schema
             let constructors = [
@@ -55,8 +59,8 @@ describe('Telegram', function() {
                 TypeBuilder
             };
 
-            Telegram.configure(MTProto, TL);
-            Telegram.useSchema(schema);
+            let instance = new Telegram(MTProto, TL);
+            instance.useSchema(schema);
 
             let typeObject = { _id: 'api.type' };
             expect(TypeBuilder.buildTypes).toHaveBeenCalledWith(schema.constructors, null, typeObject, false);
@@ -65,18 +69,8 @@ describe('Telegram', function() {
             expect(TypeBuilder.buildTypes).toHaveBeenCalledWith(schema.methods, null, methodsObject, true);
 
             // Types and Constructors are exposed on Telegram.schema
-            expect(Telegram.schema.type._id).toBe('api.type');
-            expect(Telegram.schema.service._id).toBe('api.service');
-        });
-
-        it('should throw an error if the library is not configured yet', function () {
-            Telegram.configure(null, null);
-
-            function test () {
-                Telegram.useSchema({});
-            }
-
-            expect(test).toThrow(new Error('You must use Telegram.configure() first'));
+            expect(instance.schema.type._id).toBe('api.type');
+            expect(instance.schema.service._id).toBe('api.service');
         });
     });
 
