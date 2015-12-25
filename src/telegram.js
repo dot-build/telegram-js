@@ -1,3 +1,8 @@
+/**
+ * Main Telegram class
+ * An instance of Telegram can be used to instantiate new clients that
+ * will perform the API calls
+ */
 class Telegram {
     /**
      * @param {MTProto} MTProto An object with the MTProto implementation
@@ -37,6 +42,15 @@ class Telegram {
         return new Client(this.schema, this.MTProto, this.TL);
     }
 
+    /**
+     * @param {Object} key The key config to add on MtProto layer
+     * @example
+     *   Telegram.addPublicKey({
+     *     fingerprint: '0x123123...',
+     *     modulus: '...',
+     *     exponent: '010001'
+     *   })
+     */
     addPublicKey(key) {
         let { fingerprint, modulus, exponent } = key;
 
@@ -46,4 +60,66 @@ class Telegram {
             exponent
         });
     }
+
+    /**
+     * Create a new {AuthKey} instance from a key id and a key payload.
+     * These two parameters are returned from a Telegram server during the key
+     * exchange.
+     * @param {String} authKeyId
+     * @param {String} authKeyBody
+     * @return {AuthKey}
+     */
+    createAuthKey(authKeyId, authKeyBody) {
+        let AuthKey = this.MTProto.auth.AuthKey;
+        return new AuthKey(authKeyId, authKeyBody);
+    }
+
+    /**
+     * Decrypt an AuthKey buffer. This buffer is usually generated from an authKey
+     *
+     * @example
+     * var keyBuffer = authKey.encrypt('password');
+     * var key = tg.decryptKey(keyBuffer, 'password');
+     *
+     * @param {Buffer} keyBuffer
+     * @param {String} keyPassword
+     */
+    decryptKey(keyBuffer, keyPassword) {
+        return this.MTProto.auth.AuthKey.decryptAuthKey(keyBuffer, keyPassword);
+    }
+
+    /**
+     * Utility method: converts a string to a Buffer object
+     * @param {String} string
+     * @param {Number} length
+     */
+    string2Buffer(string, length) {
+        return this.MTProto.utility.string2Buffer(string, length);
+    }
+
+    /**
+     * Utility method: converts a buffer into a string in hexadecimal format
+     * @param {String} string
+     * @param {Number} length
+     */
+    buffer2String(buffer, length) {
+        return this.MTProto.utility.buffer2String(buffer, length);
+    }
+
+    /**
+     * Creates a random string of chars.
+     * You can use it to generate an AuthKey encryption password
+     * @param {Number} [size=128]
+     */
+    createRandomPassword(size = 128) {
+        let util = this.MTProto.utility;
+        let buffer = util.createRandomBuffer(size);
+
+        return util.buffer2String(buffer);
+    }
 }
+
+/**
+ * @external {AuthKey} https://github.com/enricostara/telegram-mt-node/blob/master/lib/auth/auth-key.js
+ * @external {Buffer} https://nodejs.org/api/buffer.html
+ */

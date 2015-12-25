@@ -154,11 +154,12 @@ describe('Client', function() {
 
                 expect(client.createEncryptedChannel).toHaveBeenCalled();
                 let channelArgs = client.createEncryptedChannel.calls.argsFor(0);
+                let authKeyParam = channelArgs[0];
+                let optionsParam = channelArgs[1];
 
-                expect(channelArgs[0]).toBe(connection);
-                expect(channelArgs[1]).toBe(config);
-                expect(channelArgs[2]).toBe(authKey.key);
-                expect(channelArgs[3]).toBe(authKey.serverSalt);
+                expect(authKeyParam.key).toBe(authKey.key);
+                expect(authKeyParam.serverSalt).toBe(authKey.serverSalt);
+                expect(optionsParam).toBe(config);
 
                 expect(client.channel).toBe(channel);
                 expect(result.value).toBe(client);
@@ -187,11 +188,12 @@ describe('Client', function() {
 
             expect(client.createEncryptedChannel).toHaveBeenCalled();
             let channelArgs = client.createEncryptedChannel.calls.argsFor(0);
+            let authKeyParam = channelArgs[0];
+            let optionsParam = channelArgs[1];
 
-            expect(channelArgs[0]).toBe(connection);
-            expect(channelArgs[1]).toBe(config);
-            expect(channelArgs[2]).toBe(config.authKey);
-            expect(channelArgs[3]).toBe(Client.NULL_SERVER_SALT);
+            expect(authKeyParam.key).toBe(config.authKey);
+            expect(authKeyParam.serverSalt).toBe(Client.NULL_SERVER_SALT);
+            expect(optionsParam).toBe(config);
         });
     });
 
