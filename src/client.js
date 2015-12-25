@@ -1,13 +1,70 @@
+const NULL_SERVER_SALT = '0x0000000000000000';
+
 /**
  * Telegram Client class
  */
 class Client {
-    constructor(schema) {
+    constructor(schema, mtProto, typeLanguage) {
         this.schema = schema;
+        this.protocol = mtProto;
+        this.typeLanguage = typeLanguage;
+    }
+
+    setConnection(connection) {
+        this.connection = connection;
     }
 
     setChannel(channel) {
         this.channel = channel;
+    }
+
+    createUnencryptedChannel() {
+        let RpcChannel = this.protocol.net.RpcChannel;
+        return new RpcChannel(this.connection);
+    }
+
+    createEncryptedChannel(authKey, options) {
+        let RpcChannel = this.protocol.net.EncryptedRpcChannel;
+        let SequenceNumber = this.protocol.SequenceNumber;
+
+        let keyOptions = {
+            authKey: authKey.key,
+            serverSalt: authKey.serverSalt,
+            sessionId: this.protocol.utility.createNonce(8),
+            sequenceNumber: new SequenceNumber()
+        };
+
+        return new RpcChannel(this.connection, keyOptions, options);
+    }
+
+    createAuthKey() {
+        return new Promise((resolve, reject) => {
+            let callback = (error, key) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve(key);
+                }
+            };
+
+            this.protocol.auth.createAuthKey(
+                callback,
+                this.createUnencryptedChannel()
+            );
+        });
+    }
+
+    authenticate(config) {
+        let client = this;
+
+        function callback (auth) {
+            var channel = client.createEncryptedChannel(client.connection, config, auth.key, auth.serverSalt);
+            client.setChannel(channel);
+
+            return client;
+        }
+
+        return this.createAuthKey().then(callback);
     }
 
     callApi(apiMethod, args) {
