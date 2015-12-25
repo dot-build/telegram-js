@@ -1,7 +1,7 @@
-/* global Telegram */
+/* global Telegram, Client */
 describe('Telegram', function() {
     describe('#constructor(MtProto mtProto, TypeLanguage tl)', function() {
-        it('should allow to inject references to MtProto and TypeLanguage', function() {
+        it('should allow to inject references to MTProto and TypeLanguage', function() {
             let mtProto = {};
             let TL = {};
 
@@ -13,10 +13,10 @@ describe('Telegram', function() {
 
         it('should throw an error if the dependencies are not injected', function () {
             function test () {
-                let client = new Telegram();
+                return new Telegram();
             }
 
-            expect(test).toThrow(new Error('You must invoke new Telegram(MtProto, TypeLanguage)'));
+            expect(test).toThrow(new Error('You must invoke new Telegram(MTProto, TypeLanguage)'));
         });
     });
 
@@ -74,14 +74,26 @@ describe('Telegram', function() {
         });
     });
 
-    describe('::createClient()', function() {
+    describe('#createClient()', function() {
         it('should create and return a client using the configured schema', function () {
             let schema = {};
-            Telegram.schema = schema;
+            let MTProto = {};
 
-            let client = Telegram.createClient();
+            let TypeBuilder = {
+                buildTypes(){}
+            };
+
+            let TL = {
+                TypeBuilder
+            };
+
+            let instance = new Telegram(MTProto, TL);
+            instance.useSchema(schema);
+
+            let client = instance.createClient();
+
             expect(client instanceof Client).toBe(true);
-            expect(client.schema).toBe(schema);
+            expect(client.schema).toBe(instance.schema);
         });
     });
 });

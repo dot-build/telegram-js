@@ -5,7 +5,7 @@ class Telegram {
      */
     constructor(MTProto, TL) {
         if (!MTProto || !TL) {
-            throw new Error('You must invoke new Telegram(MtProto, TypeLanguage)');
+            throw new Error('You must invoke new Telegram(MTProto, TypeLanguage)');
         }
 
         this.MTProto = MTProto;
@@ -33,7 +33,17 @@ class Telegram {
      * Create a new Client to interact with the API
      * @return {Client} An instance of Telegram.Client
      */
-    static createClient() {
-        return new Client(this.schema);
+    createClient() {
+        return new Client(this.schema, this.MTProto, this.TL);
+    }
+
+    addPublicKey(key) {
+        let { fingerprint, modulus, exponent } = key;
+
+        this.MTProto.security.PublicKey.addKey({
+            fingerprint,
+            modulus,
+            exponent
+        });
     }
 }
