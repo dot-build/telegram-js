@@ -8,21 +8,99 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var NULL_SERVER_SALT = '0x0000000000000000';
+
 /**
  * Telegram Client class
  */
 
 var Client = (function () {
-    function Client(schema) {
+    function Client(schema, mtProto, typeLanguage) {
         _classCallCheck(this, Client);
 
         this.schema = schema;
+        this.protocol = mtProto;
+        this.typeLanguage = typeLanguage;
     }
 
     _createClass(Client, [{
+        key: 'setConnection',
+        value: function setConnection(connection) {
+            this.connection = connection;
+        }
+    }, {
         key: 'setChannel',
         value: function setChannel(channel) {
             this.channel = channel;
+        }
+    }, {
+        key: 'createUnencryptedChannel',
+        value: function createUnencryptedChannel() {
+            var RpcChannel = this.protocol.net.RpcChannel;
+            return new RpcChannel(this.connection);
+        }
+    }, {
+        key: 'createEncryptedChannel',
+        value: function createEncryptedChannel(authKey, options) {
+            var RpcChannel = this.protocol.net.EncryptedRpcChannel;
+            var SequenceNumber = this.protocol.SequenceNumber;
+
+            var keyOptions = {
+                authKey: authKey.key,
+                serverSalt: authKey.serverSalt,
+                sessionId: this.protocol.utility.createNonce(8),
+                sequenceNumber: new SequenceNumber()
+            };
+
+            return new RpcChannel(this.connection, keyOptions, options);
+        }
+    }, {
+        key: 'createAuthKey',
+        value: function createAuthKey() {
+            var _this = this;
+
+            return new Promise(function (resolve, reject) {
+                var callback = function callback(error, key) {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(key);
+                    }
+                };
+
+                _this.protocol.auth.createAuthKey(callback, _this.createUnencryptedChannel());
+            });
+        }
+    }, {
+        key: 'authenticate',
+        value: function authenticate(config) {
+            var client = this;
+
+            function callback(auth) {
+                var channel = client.createEncryptedChannel(client.connection, config, auth.key, auth.serverSalt);
+                client.setChannel(channel);
+                client.authKey = auth;
+
+                return client;
+            }
+
+            return this.createAuthKey().then(callback);
+        }
+    }, {
+        key: 'restoreFromConfig',
+        value: function restoreFromConfig(config) {
+            var channel = this.createEncryptedChannel(this.connection, config, config.authKey, NULL_SERVER_SALT);
+            this.setChannel(channel);
+        }
+    }, {
+        key: 'setup',
+        value: function setup(config) {
+            if (config.authKey) {
+                this.restoreFromConfig(config);
+                return Promise.resolve(this);
+            } else {
+                return this.authenticate(config);
+            }
         }
     }, {
         key: 'callApi',
@@ -96,37 +174,35 @@ var Client = (function () {
     return Client;
 })();
 
+Client.NULL_SERVER_SALT = NULL_SERVER_SALT;
+
 var Telegram = (function () {
-    function Telegram() {
+    /**
+     * @param {MTProto} MTProto An object with the MTProto implementation
+     * @param {TL} TL An object with the Telegram's TypeLanguage implementation
+     */
+
+    function Telegram(MTProto, TL) {
         _classCallCheck(this, Telegram);
-    }
 
-    _createClass(Telegram, null, [{
-        key: 'configure',
-
-        /**
-         * @param {MTProto} MTProto An object with the MtProto implementation
-         * @param {TL} TL An object with the Telegram's TypeLanguage implementation
-         */
-        value: function configure(MTProto, TL) {
-            Telegram.MTProto = MTProto;
-            Telegram.TL = TL;
+        if (!MTProto || !TL) {
+            throw new Error('You must invoke new Telegram(MTProto, TypeLanguage)');
         }
 
-        /**
-         * @param {Object} schema An object with all the types and methods.
-         *                        The Telegram API schema can be downloaded
-         *                        here: https://core.telegram.org/schema
-         */
+        this.MTProto = MTProto;
+        this.TL = TL;
+    }
 
-    }, {
+    /**
+     * @param {Object} schema An object with all the types and methods.
+     *                        The Telegram API schema can be downloaded
+     *                        here: https://core.telegram.org/schema
+     */
+
+    _createClass(Telegram, [{
         key: 'useSchema',
         value: function useSchema(schema) {
-            if (!Telegram.TL) {
-                throw new Error('You must use Telegram.configure() first');
-            }
-
-            var buildTypes = Telegram.TL.TypeBuilder.buildTypes;
+            var buildTypes = this.TL.TypeBuilder.buildTypes;
 
             var type = { _id: 'api.type' };
             buildTypes(schema.constructors, null, type, false);
@@ -134,7 +210,7 @@ var Telegram = (function () {
             var service = { _id: 'api.service' };
             buildTypes(schema.methods, null, service, true);
 
-            Telegram.schema = { type: type, service: service };
+            this.schema = { type: type, service: service };
         }
 
         /**
@@ -145,7 +221,20 @@ var Telegram = (function () {
     }, {
         key: 'createClient',
         value: function createClient() {
-            return new Client(Telegram.schema);
+            return new Client(this.schema, this.MTProto, this.TL);
+        }
+    }, {
+        key: 'addPublicKey',
+        value: function addPublicKey(key) {
+            var fingerprint = key.fingerprint;
+            var modulus = key.modulus;
+            var exponent = key.exponent;
+
+            this.MTProto.security.PublicKey.addKey({
+                fingerprint: fingerprint,
+                modulus: modulus,
+                exponent: exponent
+            });
         }
     }]);
 
