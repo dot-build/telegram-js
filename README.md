@@ -10,7 +10,23 @@ It's rewritten in ES6 and has far less built-in features and dependencies. It is
 
 import { Telegram } from 'telegram-js';
 import MTProto from 'telegram-mt-node';
+import TypeLanguage from 'telegram-tl-node';
 
-var telegram = new Telegram
+import schema from 'api-schema.json';
+
+var telegram = new Telegram(MTProto, TypeLanguage);
+var connection = new MTProto.net.HttpConnection({ ... });
+
+telegram.useSchema(schema);
+
+var client = telegram.createClient();
+client.setConnection(connection);
+
+var config = {};
+var ready = client.setup(config);
+
+ready.then(funtion(client) {
+	client.callApi('help.getConfig').then(...);
+});
 
 ```
