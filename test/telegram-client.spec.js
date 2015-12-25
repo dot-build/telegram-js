@@ -1,11 +1,11 @@
-/* global Client */
+/* global TelegramClient */
 describe('Client', function() {
     describe('#constructor(schema, protocol, typeLanguage)', function() {
         it('should keep a reference to injected properties', function () {
             let schema = {};
             let protocol = {};
             let tl = {};
-            let client = new Client(schema, protocol, tl);
+            let client = new TelegramClient(schema, protocol, tl);
 
             expect(client.schema).toBe(schema);
             expect(client.protocol).toBe(protocol);
@@ -22,7 +22,7 @@ describe('Client', function() {
             let RpcChannel = jasmine.createSpy().and.returnValue(channel);
             mt.net = { RpcChannel };
 
-            let client = new Client({}, mt, {});
+            let client = new TelegramClient({}, mt, {});
 
             let connection = {};
             client.setConnection(connection);
@@ -56,7 +56,7 @@ describe('Client', function() {
             mt.net = {};
             let Channel = mt.net.EncryptedRpcChannel = jasmine.createSpy().and.returnValue(channel);
 
-            let client = new Client({}, mt, {});
+            let client = new TelegramClient({}, mt, {});
 
             let connection = {};
             client.setConnection(connection);
@@ -80,7 +80,7 @@ describe('Client', function() {
     describe('#setConnection(connection)', function() {
         it('should allow to set a connection to use in the API calls', function () {
             let connection = {};
-            let client = new Client({});
+            let client = new TelegramClient({});
             client.setConnection(connection);
 
             expect(client.connection).toBe(connection);
@@ -90,7 +90,7 @@ describe('Client', function() {
     describe('#setChannel(channel)', function() {
         it('should allow to set a channel to use in API calls', function () {
             let channel = {};
-            let client = new Client({});
+            let client = new TelegramClient({});
             client.setChannel(channel);
 
             expect(client.channel).toBe(channel);
@@ -106,7 +106,7 @@ describe('Client', function() {
             let createAuthKey =  jasmine.createSpy('createAuthKey');
             mt.auth = { createAuthKey };
 
-            let client = new Client({}, mt, {});
+            let client = new TelegramClient({}, mt, {});
             spyOn(client, 'createUnencryptedChannel').and.returnValue(channel);
 
             let authKey = {};
@@ -129,7 +129,7 @@ describe('Client', function() {
     describe('#authenticate(config)', function() {
         it('should create an AuthKey and configure an encrypted channel with the given configuration', function (done) {
             let connection = {};
-            let client = new Client({}, {}, {});
+            let client = new TelegramClient({}, {}, {});
 
             client.setConnection(connection);
 
@@ -179,7 +179,7 @@ describe('Client', function() {
                 authKey: key
             };
 
-            let client = new Client({}, {}, {});
+            let client = new TelegramClient({}, {}, {});
             client.setConnection(connection);
 
             spyOn(client, 'createEncryptedChannel').and.returnValue(channel);
@@ -192,7 +192,7 @@ describe('Client', function() {
             let optionsParam = channelArgs[1];
 
             expect(authKeyParam.key).toBe(config.authKey);
-            expect(authKeyParam.serverSalt).toBe(Client.NULL_SERVER_SALT);
+            expect(authKeyParam.serverSalt).toBe(TelegramClient.NULL_SERVER_SALT);
             expect(optionsParam).toBe(config);
         });
     });
@@ -200,7 +200,7 @@ describe('Client', function() {
     describe('#setup(config)', function() {
         it('should delegate the config to #authenticate()', function (done) {
             let config = {};
-            let client = new Client({}, {}, {});
+            let client = new TelegramClient({}, {}, {});
 
             spyOn(client, 'authenticate');
 
@@ -214,7 +214,7 @@ describe('Client', function() {
 
         it('should delegate the config to #authenticate()', function (done) {
             let config = {};
-            let client = new Client({}, {}, {});
+            let client = new TelegramClient({}, {}, {});
 
             spyOn(client, 'restoreFromConfig');
 
@@ -265,7 +265,7 @@ describe('Client', function() {
             };
 
             let channel = {};
-            let client = new Client(schema);
+            let client = new TelegramClient(schema);
             client.setChannel(channel);
 
             let apiResponse = {};
@@ -293,7 +293,7 @@ describe('Client', function() {
 
         it('should reject the returned promise if the api call fails', function (done) {
             let channel = {};
-            let client = new Client(schema);
+            let client = new TelegramClient(schema);
             client.setChannel(channel);
 
             let error = {};
@@ -313,7 +313,7 @@ describe('Client', function() {
 
         it('should return a rejected promise if the namespace is not registered', function (done) {
             let channel = {};
-            let client = new Client(schema);
+            let client = new TelegramClient(schema);
             client.setChannel(channel);
 
             let result = client.callApi('invalid.method', {});
@@ -327,7 +327,7 @@ describe('Client', function() {
 
         it('should return a rejected promise if the namespace is not registered', function (done) {
             let channel = {};
-            let client = new Client(schema);
+            let client = new TelegramClient(schema);
             client.setChannel(channel);
 
             let result = client.callApi('test.invalidmethod', {});
@@ -340,7 +340,7 @@ describe('Client', function() {
         });
 
         it('should return a rejected promise if the client has no channel configured', function (done) {
-            let client = new Client(schema);
+            let client = new TelegramClient(schema);
             client.setChannel(null);
 
             let result = client.callApi('any.method', {});

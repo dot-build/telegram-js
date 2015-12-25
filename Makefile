@@ -10,4 +10,8 @@ coverage:
 build:
 	./node_modules/.bin/gulp build
 
-.PHONY: test tdd build coverage
+docs:
+	rm -rf docs;\
+	./node_modules/.bin/esdoc -c esdoc.json;
+
+.PHONY: test tdd build coverage docs

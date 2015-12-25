@@ -8,6 +8,7 @@ module.exports = function(config) {
         frameworks: ['jasmine'],
         files: [
             require.resolve('babel-polyfill/browser'),
+            'test/cjs-polyfill.js',
             'src/**/*.js',
             'test/**/*.spec.js'
         ],

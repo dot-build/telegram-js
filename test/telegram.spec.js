@@ -1,4 +1,4 @@
-/* global Telegram, Client */
+/* global Telegram, TelegramClient */
 describe('Telegram', function() {
     describe('#constructor(MtProto mtProto, TypeLanguage tl)', function() {
         it('should allow to inject references to MTProto and TypeLanguage', function() {
@@ -92,7 +92,7 @@ describe('Telegram', function() {
 
             let client = instance.createClient();
 
-            expect(client instanceof Client).toBe(true);
+            expect(client instanceof TelegramClient).toBe(true);
             expect(client.schema).toBe(instance.schema);
         });
     });

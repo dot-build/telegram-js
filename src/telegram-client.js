@@ -2,8 +2,9 @@ const NULL_SERVER_SALT = '0x0000000000000000';
 
 /**
  * Telegram Client class
+ * @class TelegramClient
  */
-class Client {
+class TelegramClient {
     constructor(schema, mtProto, typeLanguage) {
         this.schema = schema;
         this.protocol = mtProto;
@@ -204,9 +205,14 @@ class Client {
     }
 }
 
-Client.NULL_SERVER_SALT = NULL_SERVER_SALT;
+TelegramClient.NULL_SERVER_SALT = NULL_SERVER_SALT;
+
+export { TelegramClient };
 
 /**
  * @external {RcpChannel} https://github.com/enricostara/telegram-mt-node/blob/master/lib/net/rpc-channel.js
+ */
+
+/**
  * @external {EncryptedRpcChannel} https://github.com/enricostara/telegram-mt-node/blob/master/lib/net/encrypted-rpc-channel.js
  */

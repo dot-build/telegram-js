@@ -2,6 +2,7 @@
  * Main Telegram class
  * An instance of Telegram can be used to instantiate new clients that
  * will perform the API calls
+ * @class Telegram
  */
 class Telegram {
     /**
@@ -35,11 +36,11 @@ class Telegram {
     }
 
     /**
-     * Create a new Client to interact with the API
-     * @return {Client} An instance of Telegram.Client
+     * Create a new client to interact with the API
+     * @return {TelegramClient} An instance of Telegram.Client
      */
     createClient() {
-        return new Client(this.schema, this.MTProto, this.TL);
+        return new TelegramClient(this.schema, this.MTProto, this.TL);
     }
 
     /**
@@ -83,6 +84,7 @@ class Telegram {
      *
      * @param {Buffer} keyBuffer
      * @param {String} keyPassword
+     * @return {AuthKey}
      */
     decryptKey(keyBuffer, keyPassword) {
         return this.MTProto.auth.AuthKey.decryptAuthKey(keyBuffer, keyPassword);
@@ -92,6 +94,7 @@ class Telegram {
      * Utility method: converts a string to a Buffer object
      * @param {String} string
      * @param {Number} length
+     * @return {Buffer}
      */
     string2Buffer(string, length) {
         return this.MTProto.utility.string2Buffer(string, length);
@@ -99,8 +102,9 @@ class Telegram {
 
     /**
      * Utility method: converts a buffer into a string in hexadecimal format
-     * @param {String} string
+     * @param {String} buffer
      * @param {Number} length
+     * @return {String}
      */
     buffer2String(buffer, length) {
         return this.MTProto.utility.buffer2String(buffer, length);
@@ -119,7 +123,12 @@ class Telegram {
     }
 }
 
+export { Telegram };
+
 /**
  * @external {AuthKey} https://github.com/enricostara/telegram-mt-node/blob/master/lib/auth/auth-key.js
+ */
+
+/**
  * @external {Buffer} https://nodejs.org/api/buffer.html
  */
