@@ -60,11 +60,26 @@ class Client {
         function callback (auth) {
             var channel = client.createEncryptedChannel(client.connection, config, auth.key, auth.serverSalt);
             client.setChannel(channel);
+            client.authKey = auth;
 
             return client;
         }
 
         return this.createAuthKey().then(callback);
+    }
+
+    restoreFromConfig(config) {
+        var channel = this.createEncryptedChannel(this.connection, config, config.authKey, NULL_SERVER_SALT);
+        this.setChannel(channel);
+    }
+
+    setup(config) {
+        if (config.authKey) {
+            this.restoreFromConfig(config);
+            return Promise.resolve(this);
+        } else {
+            return this.authenticate(config);
+        }
     }
 
     callApi(apiMethod, args) {
@@ -125,5 +140,6 @@ class Client {
 
         return props;
     }
-
 }
+
+Client.NULL_SERVER_SALT = NULL_SERVER_SALT;

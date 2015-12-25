@@ -117,9 +117,7 @@ describe('Client', function() {
 
             let result = client.createAuthKey();
 
-            result.then(function (key) {
-                result.key = key;
-            });
+            result.then(key => result.key = key);
 
             setTimeout(function () {
                 expect(result.key).toBe(authKey);
@@ -149,9 +147,7 @@ describe('Client', function() {
 
             let result = client.authenticate(config);
 
-            result.then(function (value) {
-                result.value = value;
-            });
+            result.then(value => result.value = value);
 
             setTimeout(function () {
                 expect(client.createAuthKey).toHaveBeenCalled();
@@ -166,6 +162,68 @@ describe('Client', function() {
 
                 expect(client.channel).toBe(channel);
                 expect(result.value).toBe(client);
+
+                expect(client.authKey).toBe(authKey);
+                done();
+            });
+        });
+    });
+
+    describe('#restoreFromConfig(config)', function() {
+        it('should create and encrypted channel using an auth key in the config', function () {
+            let key = '0x1231312312312';
+            let channel = {};
+            let connection = {};
+            let config = {
+                authKey: key
+            };
+
+            let client = new Client({}, {}, {});
+            client.setConnection(connection);
+
+            spyOn(client, 'createEncryptedChannel').and.returnValue(channel);
+
+            client.restoreFromConfig(config);
+
+            expect(client.createEncryptedChannel).toHaveBeenCalled();
+            let channelArgs = client.createEncryptedChannel.calls.argsFor(0);
+
+            expect(channelArgs[0]).toBe(connection);
+            expect(channelArgs[1]).toBe(config);
+            expect(channelArgs[2]).toBe(config.authKey);
+            expect(channelArgs[3]).toBe(Client.NULL_SERVER_SALT);
+        });
+    });
+
+    describe('#setup(config)', function() {
+        it('should delegate the config to #authenticate()', function (done) {
+            let config = {};
+            let client = new Client({}, {}, {});
+
+            spyOn(client, 'authenticate');
+
+            client.setup(config);
+
+            setTimeout(function () {
+                expect(client.authenticate).toHaveBeenCalledWith(config);
+                done();
+            });
+        });
+
+        it('should delegate the config to #authenticate()', function (done) {
+            let config = {};
+            let client = new Client({}, {}, {});
+
+            spyOn(client, 'restoreFromConfig');
+
+            config.authKey = '0x1231312312312';
+
+            let result = client.setup(config);
+            result.then(value => result.value = value);
+
+            setTimeout(function () {
+                expect(result.value).toBe(client);
+                expect(client.restoreFromConfig).toHaveBeenCalledWith(config);
                 done();
             });
         });
