@@ -231,6 +231,28 @@ var TelegramClient = (function () {
                 method({ props: props, channel: channel, callback: callback });
             });
         }
+
+        /**
+         * Creates an instance of a TL constructor defined by the API schema
+         *
+         * @param {String} apiType Name of the API Type constructor
+         * @param {Object} [params] Optional argument with the construction parameters
+         * @return {Object} An instance of the given constructor
+         * @example
+         *     let inputUser = client.createType('InputUserContact', {
+         *         user_id: 123123
+         *     });
+         */
+
+    }, {
+        key: 'createType',
+        value: function createType(apiType, params) {
+            var Type = this.schema.type[apiType];
+
+            return new Type({
+                props: params
+            });
+        }
     }, {
         key: '_readProperties',
         value: function _readProperties(params) {
@@ -255,12 +277,6 @@ var TelegramClient = (function () {
 
             return props;
         }
-
-        /**
-         * @external {RcpChannel} https://github.com/enricostara/telegram-mt-node/blob/master/lib/net/rpc-channel.js
-         * @external {EncryptedRpcChannel} https://github.com/enricostara/telegram-mt-node/blob/master/lib/net/encrypted-rpc-channel.js
-         */
-
     }]);
 
     return TelegramClient;
@@ -269,6 +285,14 @@ var TelegramClient = (function () {
 TelegramClient.NULL_SERVER_SALT = NULL_SERVER_SALT;
 
 exports.TelegramClient = TelegramClient;
+
+/**
+ * @external {RcpChannel} https://github.com/enricostara/telegram-mt-node/blob/master/lib/net/rpc-channel.js
+ */
+
+/**
+ * @external {EncryptedRpcChannel} https://github.com/enricostara/telegram-mt-node/blob/master/lib/net/encrypted-rpc-channel.js
+ */
 /**
  * Main Telegram class
  * An instance of Telegram can be used to instantiate new clients that
@@ -373,6 +397,7 @@ var Telegram = (function () {
          *
          * @param {Buffer} keyBuffer
          * @param {String} keyPassword
+         * @return {AuthKey}
          */
 
     }, {
@@ -385,6 +410,7 @@ var Telegram = (function () {
          * Utility method: converts a string to a Buffer object
          * @param {String} string
          * @param {Number} length
+         * @return {Buffer}
          */
 
     }, {
@@ -397,6 +423,7 @@ var Telegram = (function () {
          * Utility method: converts a buffer into a string in hexadecimal format
          * @param {String} buffer
          * @param {Number} length
+         * @return {String}
          */
 
     }, {
@@ -421,17 +448,19 @@ var Telegram = (function () {
 
             return util.buffer2String(buffer);
         }
-
-        /**
-         * @external {AuthKey} https://github.com/enricostara/telegram-mt-node/blob/master/lib/auth/auth-key.js
-         * @external {Buffer} https://nodejs.org/api/buffer.html
-         */
-
     }]);
 
     return Telegram;
 })();
 
 exports.Telegram = Telegram;
+
+/**
+ * @external {AuthKey} https://github.com/enricostara/telegram-mt-node/blob/master/lib/auth/auth-key.js
+ */
+
+/**
+ * @external {Buffer} https://nodejs.org/api/buffer.html
+ */
 
 })(typeof module !== 'undefined' && module.exports || this);
