@@ -181,25 +181,6 @@ class TelegramClient {
         });
     }
 
-    /**
-     * Creates an instance of a TL constructor defined by the API schema
-     *
-     * @param {String} apiType Name of the API Type constructor
-     * @param {Object} [params] Optional argument with the construction parameters
-     * @return {Object} An instance of the given constructor
-     * @example
-     *     let inputUser = client.createType('InputUserContact', {
-     *         user_id: 123123
-     *     });
-     */
-    createType(apiType, params) {
-        let Type = this.schema.type[apiType];
-
-        return new Type({
-            props: params
-        });
-    }
-
     _readProperties(params) {
         let props = {};
         let api = this.schema;

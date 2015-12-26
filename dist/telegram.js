@@ -118,7 +118,7 @@ var TelegramClient = (function () {
          * Creates an authKey and setups an encrypted channel in the client with
          * this new key.
          * @param {Object} config Configuration passed in to the EncryptedRpcChannel
-         * @return {Promise<Client>} Returns back the client once it finishes the setup
+         * @return {Promise<TelegramClient>} Returns back the client once it finishes the setup
          */
 
     }, {
@@ -231,28 +231,6 @@ var TelegramClient = (function () {
                 method({ props: props, channel: channel, callback: callback });
             });
         }
-
-        /**
-         * Creates an instance of a TL constructor defined by the API schema
-         *
-         * @param {String} apiType Name of the API Type constructor
-         * @param {Object} [params] Optional argument with the construction parameters
-         * @return {Object} An instance of the given constructor
-         * @example
-         *     let inputUser = client.createType('InputUserContact', {
-         *         user_id: 123123
-         *     });
-         */
-
-    }, {
-        key: 'createType',
-        value: function createType(apiType, params) {
-            var Type = this.schema.type[apiType];
-
-            return new Type({
-                props: params
-            });
-        }
     }, {
         key: '_readProperties',
         value: function _readProperties(params) {
@@ -338,6 +316,28 @@ var Telegram = (function () {
         }
 
         /**
+         * Creates an instance of a TL constructor defined by the API schema
+         *
+         * @param {String} apiType Name of the API Type constructor
+         * @param {Object} [params] Optional argument with the construction parameters
+         * @return {Object} An instance of the given constructor
+         * @example
+         *     let inputUser = client.createType('InputUserContact', {
+         *         user_id: 123123
+         *     });
+         */
+
+    }, {
+        key: 'createType',
+        value: function createType(apiType, params) {
+            var Type = this.schema.type[apiType];
+
+            return new Type({
+                props: params
+            });
+        }
+
+        /**
          * Create a new client to interact with the API
          * @return {TelegramClient} An instance of Telegram.Client
          */
@@ -373,7 +373,7 @@ var Telegram = (function () {
         }
 
         /**
-         * Create a new {AuthKey} instance from a key id and a key payload.
+         * Create a new {@link AuthKey} instance from a key id and a key payload.
          * These two parameters are returned from a Telegram server during the key
          * exchange.
          * @param {String} authKeyId
