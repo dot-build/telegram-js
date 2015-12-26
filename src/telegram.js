@@ -63,7 +63,7 @@ class Telegram {
     }
 
     /**
-     * Create a new {AuthKey} instance from a key id and a key payload.
+     * Create a new {@link AuthKey} instance from a key id and a key payload.
      * These two parameters are returned from a Telegram server during the key
      * exchange.
      * @param {String} authKeyId

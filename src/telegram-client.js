@@ -87,7 +87,7 @@ class TelegramClient {
      * Creates an authKey and setups an encrypted channel in the client with
      * this new key.
      * @param {Object} config Configuration passed in to the EncryptedRpcChannel
-     * @return {Promise<Client>} Returns back the client once it finishes the setup
+     * @return {Promise<TelegramClient>} Returns back the client once it finishes the setup
      */
     authenticate(config) {
         let client = this;
