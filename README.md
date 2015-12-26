@@ -4,7 +4,7 @@ Client library to access the Telegram API. This package is based on the work of 
 
 It's rewritten in ES6 and has far less built-in features and dependencies. It is compatible with [telegram-mt-node](https://github.com/enricostara/telegram-mt-node) and [telegram-tl-node](https://github.com/enricostara/telegram-tl-node), but is not a drop-in replacement.
 
-## TD;DR
+## TL;DR
 
 ```js
 
