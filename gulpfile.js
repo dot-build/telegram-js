@@ -42,3 +42,6 @@ function onError(err) {
 }
 
 gulp.task('build', buildRelease);
+gulp.task('watch', function () {
+    gulp.watch('src/*.js', ['build']);
+});

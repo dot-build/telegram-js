@@ -2,9 +2,9 @@
 
     'use strict';
 
-var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; })();
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 Object.defineProperty(exports, "__esModule", {
     value: true
@@ -19,7 +19,7 @@ var NULL_SERVER_SALT = '0x0000000000000000';
  * @class TelegramClient
  */
 
-var TelegramClient = (function () {
+var TelegramClient = function () {
     function TelegramClient(schema, mtProto, typeLanguage) {
         _classCallCheck(this, TelegramClient);
 
@@ -258,7 +258,7 @@ var TelegramClient = (function () {
     }]);
 
     return TelegramClient;
-})();
+}();
 
 TelegramClient.NULL_SERVER_SALT = NULL_SERVER_SALT;
 
@@ -278,7 +278,7 @@ exports.TelegramClient = TelegramClient;
  * @class Telegram
  */
 
-var Telegram = (function () {
+var Telegram = function () {
     /**
      * @param {MTProto} MTProto An object with the MTProto implementation
      * @param {TL} TL An object with the Telegram's TypeLanguage implementation
@@ -296,45 +296,47 @@ var Telegram = (function () {
     }
 
     /**
+     * Imports a schema structure into the library. The default Telegram API schema
+     * can be downloaded here: https://core.telegram.org/schema
+     *
+     * The prefixes are added in front of all types and methods declared on schema,
+     * so after loading the schema you will access them like this:
+     *
+     * @example
+     *     // let's assume that your schema has a "foo.TypeFoo" type and a
+     *     // "foo.callFoo" method
+     *     Telegram.useSchema(schema, 'types', 'methods');
+     *
+     *     let types = Telegram.schema.type;
+     *     let methods = Telegram.schema.service;
+     *
+     *     let TypeFoo = types.foo.TypeFoo;
+     *     let callFoo = methods.foo.callFoo;
+     *
+     *
      * @param {Object} schema An object with all the types and methods.
-     *                        The Telegram API schema can be downloaded
-     *                        here: https://core.telegram.org/schema
+     * @param {String} typePrefix       A prefix to all the schema types
+     * @param {String} servicePrefix    A prefix to all the schema methods
      */
 
     _createClass(Telegram, [{
         key: 'useSchema',
         value: function useSchema(schema) {
+            var typePrefix = arguments.length <= 1 || arguments[1] === undefined ? 'Telegram.type' : arguments[1];
+            var servicePrefix = arguments.length <= 2 || arguments[2] === undefined ? 'Telegram.service' : arguments[2];
+
             var buildTypes = this.TL.TypeBuilder.buildTypes;
 
-            var type = { _id: 'api.type' };
+            var type = { _id: typePrefix };
             buildTypes(schema.constructors, null, type, false);
 
-            var service = { _id: 'api.service' };
+            var service = { _id: servicePrefix };
             buildTypes(schema.methods, null, service, true);
 
+            /**
+             * @property {Object} schema
+             */
             this.schema = { type: type, service: service };
-        }
-
-        /**
-         * Creates an instance of a TL constructor defined by the API schema
-         *
-         * @param {String} apiType Name of the API Type constructor
-         * @param {Object} [params] Optional argument with the construction parameters
-         * @return {Object} An instance of the given constructor
-         * @example
-         *     let inputUser = client.createType('InputUserContact', {
-         *         user_id: 123123
-         *     });
-         */
-
-    }, {
-        key: 'createType',
-        value: function createType(apiType, params) {
-            var Type = this.schema.type[apiType];
-
-            return new Type({
-                props: params
-            });
         }
 
         /**
@@ -451,7 +453,7 @@ var Telegram = (function () {
     }]);
 
     return Telegram;
-})();
+}();
 
 exports.Telegram = Telegram;
 

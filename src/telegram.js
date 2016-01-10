@@ -19,39 +19,41 @@ class Telegram {
     }
 
     /**
+     * Imports a schema structure into the library. The default Telegram API schema
+     * can be downloaded here: https://core.telegram.org/schema
+     *
+     * The prefixes are added in front of all types and methods declared on schema,
+     * so after loading the schema you will access them like this:
+     *
+     * @example
+     *     // let's assume that your schema has a "foo.TypeFoo" type and a
+     *     // "foo.callFoo" method
+     *     Telegram.useSchema(schema, 'types', 'methods');
+     *
+     *     let types = Telegram.schema.type;
+     *     let methods = Telegram.schema.service;
+     *
+     *     let TypeFoo = types.foo.TypeFoo;
+     *     let callFoo = methods.foo.callFoo;
+     *
+     *
      * @param {Object} schema An object with all the types and methods.
-     *                        The Telegram API schema can be downloaded
-     *                        here: https://core.telegram.org/schema
+     * @param {String} typePrefix       A prefix to all the schema types
+     * @param {String} servicePrefix    A prefix to all the schema methods
      */
-    useSchema(schema) {
+    useSchema(schema, typePrefix = 'Telegram.type', servicePrefix = 'Telegram.service') {
         let buildTypes = this.TL.TypeBuilder.buildTypes;
 
-        var type = {_id: 'api.type'};
+        var type = {_id: typePrefix};
         buildTypes(schema.constructors, null, type, false);
 
-        var service = { _id: 'api.service'};
+        var service = { _id: servicePrefix};
         buildTypes(schema.methods, null, service, true);
 
+        /**
+         * @property {Object} schema
+         */
         this.schema = { type, service };
-    }
-
-    /**
-     * Creates an instance of a TL constructor defined by the API schema
-     *
-     * @param {String} apiType Name of the API Type constructor
-     * @param {Object} [params] Optional argument with the construction parameters
-     * @return {Object} An instance of the given constructor
-     * @example
-     *     let inputUser = client.createType('InputUserContact', {
-     *         user_id: 123123
-     *     });
-     */
-    createType(apiType, params) {
-        let Type = this.schema.type[apiType];
-
-        return new Type({
-            props: params
-        });
     }
 
     /**

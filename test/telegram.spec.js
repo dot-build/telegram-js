@@ -20,7 +20,7 @@ describe('Telegram', function() {
         });
     });
 
-    describe('#useSchema(schema)', function() {
+    describe('#useSchema(schema, typePrefix, servicePrefix)', function() {
         it('should build the types and methods used on clients from schema', function() {
             // From Telegram API schema
             let constructors = [
@@ -60,17 +60,20 @@ describe('Telegram', function() {
             };
 
             let instance = new Telegram(MTProto, TL);
-            instance.useSchema(schema);
+            let typePrefix = 'types';
+            let servicePrefix = 'methods';
 
-            let typeObject = { _id: 'api.type' };
+            instance.useSchema(schema, typePrefix, servicePrefix);
+
+            let typeObject = { _id: typePrefix };
             expect(TypeBuilder.buildTypes).toHaveBeenCalledWith(schema.constructors, null, typeObject, false);
 
-            let methodsObject = { _id: 'api.service' };
+            let methodsObject = { _id: servicePrefix };
             expect(TypeBuilder.buildTypes).toHaveBeenCalledWith(schema.methods, null, methodsObject, true);
 
             // Types and Constructors are exposed on Telegram.schema
-            expect(instance.schema.type._id).toBe('api.type');
-            expect(instance.schema.service._id).toBe('api.service');
+            expect(instance.schema.type._id).toBe(typePrefix);
+            expect(instance.schema.service._id).toBe(servicePrefix);
         });
     });
 
