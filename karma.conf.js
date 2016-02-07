@@ -13,7 +13,6 @@ module.exports = function(config) {
             'test/**/*.spec.js'
         ],
         preprocessors: {
-            'src/**/*.js': ['babel'],
             'test/**/*.js': ['babel']
         }
     });
