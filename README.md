@@ -8,32 +8,6 @@ It's rewritten in ES6 and has far less built-in features and dependencies. It is
 
 https://doc.esdoc.org/github.com/dot-build/telegram-js/
 
-## TL;DR - Using available open source libraries and Telegram API
+## Usage
 
-```js
-
-import { Telegram } from 'telegram-js';
-import MTProto from 'telegram-mt-node';
-import TypeLanguage from 'telegram-tl-node';
-
-// Download from https://core.telegram.org/schema/json
-import schema from 'api-schema.json';
-
-var telegram = new Telegram(MTProto, TypeLanguage);
-var connection = new MTProto.net.HttpConnection({});
-
-telegram.useSchema(schema);
-
-var client = telegram.createClient();
-client.setConnection(connection);
-
-var config = {};
-var ready = client.setup(config);
-
-ready.then(funtion(client) {
-    client.callApi('help.getConfig').then(function (response) {
-        // ...
-    });
-});
-
-```
+See the file `sample.js` on git repository to see how to invoke the API.
