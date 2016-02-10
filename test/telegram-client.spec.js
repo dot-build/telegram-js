@@ -236,13 +236,14 @@ describe('Client', function() {
 
         class BoolTrue {}
         class BoolFalse {}
+        class MethodConstructor {
+            constructor({props}) {
+                Object.assign(this, props);
+            }
+        }
 
         beforeEach(function () {
-            apiService = {
-                test: {
-                    fooMethod: jasmine.createSpy('test.fooMethod')
-                }
-            };
+            apiService = {};
 
             apiType = {
                 BoolTrue,
@@ -254,38 +255,47 @@ describe('Client', function() {
                 service: apiService
             };
 
-            method = 'test.fooMethod';
+            method = 'test.apiMethod';
         });
 
         it('should run a method with the given arguments and return a promise', function (done) {
+            let channel = {};
+            channel.callMethod = jasmine.createSpy();
+
+            let client = new TelegramClient(schema);
+            client.setChannel(channel);
+
+            let apiMethod = jasmine.createSpy();
+            apiMethod.Type = MethodConstructor;
+
+            // API test.apiMethod
+            apiService.test = { apiMethod };
+
+            let apiResponse = {};
+
+            // methods constructed in the Type Language library have a .Type property
+            // which is a constructor to a TypeObject. This constructor is then used
+            // to instantiate a new object, passed in to the mtproto channel
+            channel.callMethod.and.callFake(function (obj, callback) {
+                expect(obj.foo instanceof BoolTrue).toBe(true);
+                expect(obj.bar instanceof BoolFalse).toBe(true);
+                expect(obj.baz).toBe(1);
+
+                // successful response
+                callback(null, apiResponse);
+            });
+
             let args = {
                 foo: true,
                 bar: false,
                 baz: 1
             };
 
-            let channel = {};
-            let client = new TelegramClient(schema);
-            client.setChannel(channel);
-
-            let apiResponse = {};
-            apiService.test.fooMethod.and.callFake(function (params) {
-                let {props, channel, callback} = params;
-
-                expect(props.foo instanceof BoolTrue).toBe(true);
-                expect(props.bar instanceof BoolFalse).toBe(true);
-                expect(props.baz).toBe(1);
-
-                expect(channel).toBe(client.channel);
-
-                // successful response
-                callback(null, apiResponse);
-            });
-
             let result = client.callApi(method, args);
             result.then(x => result.$$response = x);
 
             setTimeout(function () {
+                expect(channel.callMethod).toHaveBeenCalled();
                 expect(result.$$response).toBe(apiResponse);
                 done();
             });
@@ -293,16 +303,25 @@ describe('Client', function() {
 
         it('should reject the returned promise if the api call fails', function (done) {
             let channel = {};
+            channel.callMethod = jasmine.createSpy();
             let client = new TelegramClient(schema);
             client.setChannel(channel);
 
+            let apiMethod = jasmine.createSpy();
+            apiMethod.Type = MethodConstructor;
+
+            // API test.apiMethod
+            apiService.test = { apiMethod };
+
+            let args = { foo: 'bar' };
+
             let error = {};
-            apiService.test.fooMethod.and.callFake(function (props) {
-                let { callback } = props;
+            channel.callMethod.and.callFake(function (obj, callback) {
+                expect(obj.foo).toBe('bar');
                 callback(error);
             });
 
-            let result = client.callApi(method, {});
+            let result = client.callApi(method, args);
             result.catch(x => result.$$error = x);
 
             setTimeout(function () {

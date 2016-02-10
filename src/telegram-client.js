@@ -167,6 +167,8 @@ class TelegramClient {
         }
 
         let channel = this.channel;
+        let MethodType = method.Type;
+        let methodObject = new MethodType({ props });
 
         return new Promise((resolve, reject) => {
             let callback = (error, result) => {
@@ -177,7 +179,7 @@ class TelegramClient {
                 resolve(result);
             };
 
-            method({ props, channel, callback });
+            channel.callMethod(methodObject, callback);
         });
     }
 
