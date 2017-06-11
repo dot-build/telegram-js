@@ -35,7 +35,7 @@ client.setConnection(connection);
 connection.connect(function () {
     let ready = client.setup(config);
 
-    ready.then(funtion(client) {
+    ready.then(function(client) {
         function callback(response) {
             console.log(response);
         }
